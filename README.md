@@ -23,7 +23,7 @@ Please select a reasonable name for the zone as it cannot be altered once it was
 
 Install the lightweight Puppeteer-core package (comes without its own browser distribution)
 
-```npm i puppeteer-core```
+`npm i puppeteer-core`
 
 Simply add your credentials from the **'Access Parameters'** tab - zone, and target URL instead of the placeholders in the below script example.
 
@@ -55,4 +55,67 @@ if (require.main==module)
 
 Run the script:
 
-```node script.js```
+`node script.js`
+
+## Python
+
+First you need to install Playwright:
+
+```python
+pip3 install playwright
+```
+
+In the example script below, simply add your credentials, zone, and target URL instead of the placeholders:
+
+```python
+import asyncio
+from playwright.async_api import async_playwright
+
+auth = 'brd-customer-hl_b685f489-zone-scraping_browser:yq5zs66xnk05'
+browser_url = f'@zproxy.lum-superproxy.io:9222'">https://{auth}@zproxy.lum-superproxy.io:9222'
+async def main():
+   async with async_playwright() as pw:
+       print('connecting');
+       browser = await pw.chromium.connect_over_cdp(browser_url)
+       print('connected');
+       page = await browser.new_page()
+       print('goto')
+       await page.goto('http://lumtest.com/myip.json', timeout=120000)
+       print('done, evaluating')
+       print(await page.evaluate('()=>document.documentElement.outerHTML'))
+       await browser.close()
+
+asyncio.run(main())
+```
+**Run this script**
+```python
+python scrape.py
+```
+## Additional scraping browser features
+
+**Blocking some requests to save bandwidth**
+```
+// connect to a remote browser...
+const blockedUrls = ['*doubleclick.net*];const page = await browser.newPage();const client = await page.target().createCDPSession();
+await client.send('Network.enable');await client.send('Network.setBlockedURLs', {urls: blockedUrls});await page.goto('https://washingtonpost.com');
+```
+**Targeting specific GEO-locations**
+
+As with other Bright Data [proxy types](https://brightdata.grsm.io/vitariz-proxy) you can use the same country-targeting parameter is available when using the Scraping Browser.
+When you send the request add `-country` tag after the zone's name followed by the 2 character ISO code representing the country. Here is an example of how to use the tag for targeting the US:
+```
+curl--proxy zproxy.lum-superproxy.io:22225 --proxy-user brd-customer-<CUSTOMER_ID>-zone-<ZONE_NAME>-country-us: <ZONE_PASSWORD>  "http://target.site"
+```
+
+**Targeting EU region**
+
+You can target the entire European Union region in the same manner as “Country” above by adding “eu” after “country” in the request: `-country-eu`
+This will randomly use an IP from one of the countries included:
+```
+AL, AZ, KG, BA, UZ, BI, XK, SM, DE, AT, CH, UK, GB, IE, IM, FR, ES, NL, IT, PT, BE, AD, MT, MC, MA, LU, TN, DZ, GI, LI, SE, DK, FI, NO, AX, IS, GG, JE, EU, GL, VA, FX, FO
+```
+
+
+
+
+
